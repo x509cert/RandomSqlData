@@ -56,8 +56,8 @@ var lastNames = File.ReadAllLines(@".\last-names.txt");
 Random rng = new();
 
 // Edit for your Server and Database
-string sqlConn = "server=tcp:xxxxxx.database.windows.net; " +
-                 "database=ContosoMH; " +
+string sqlConn = "server=tcp:xxxxx.database.windows.net; " +
+                 "database=xxxxxxx; " +
                  "encrypt=true; Column Encryption Setting=Enabled; Attestation Protocol=None;";
 
 // Login to Azure 
