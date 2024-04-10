@@ -1,21 +1,42 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 /// Sample code to insert data into a table:
-/// CREATE TABLE [dbo].[Employees](
-///	    [EmployeeID] [int] IDENTITY(1,1) NOT NULL,
-///	    [SSN] [char](11) COLLATE Latin1_General_BIN2 
-///	        ENCRYPTED WITH (COLUMN_ENCRYPTION_KEY = [CEK], 
-///	        ENCRYPTION_TYPE = Randomized, 
-///	        ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256') 
-///	        NOT NULL,
-///	    [FirstName] [nvarchar](50) NOT NULL,
-///	    [LastName] [nvarchar](50) NOT NULL,
-///	    [Salary] [money] 
-///	        ENCRYPTED WITH (COLUMN_ENCRYPTION_KEY = [CEK], 
-///	        ENCRYPTION_TYPE = Randomized, 
-///	        ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256') 
-///	        NOT NULL
-///) ON [PRIMARY]
-///
+/////////////////////////////////////////////////////////////////////////////
+
+/*
+
+CREATE SCHEMA [HR];
+GO
+
+CREATE TABLE [HR].[Employees]
+(
+    [EmployeeID] [int] IDENTITY(1,1) NOT NULL
+    , [SSN] [char](11) NOT NULL
+    , [FirstName] [nvarchar](50) NOT NULL
+    , [LastName] [nvarchar](50) NOT NULL
+    , [Salary] [money] NOT NULL
+) ON [PRIMARY];
+
+Then using either SSMS or PowerShell, 
+you will enable Always Encrypted on the SSN and Salary columns:
+
+CREATE TABLE [HR].[Employees](
+    [EmployeeID] [int] IDENTITY(1,1) NOT NULL,
+    [SSN] [char](11) COLLATE Latin1_General_BIN2 
+        ENCRYPTED WITH COLUMN_ENCRYPTION_KEY = [CEK], 
+        ENCRYPTION_TYPE = Randomized, 
+        ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256') 
+        NOT NULL,
+    [FirstName] [nvarchar](50) NOT NULL,
+    [LastName] [nvarchar](50) NOT NULL,
+    [Salary] [money] 
+        ENCRYPTED WITH COLUMN_ENCRYPTION_KEY = [CEK], 
+        ENCRYPTION_TYPE = Randomized, 
+        ALGORITHM = 'AEAD_AES_256_CBC_HMAC_SHA_256') 
+        NOT NULL
+ ON [PRIMARY]
+*/
+
+/////////////////////////////////////////////////////////////////////////////
 /// Written by Michael Howard 
 /// Azure Data Security Team
 /////////////////////////////////////////////////////////////////////////////
@@ -35,8 +56,8 @@ var lastNames = File.ReadAllLines(@".\last-names.txt");
 Random rng = new();
 
 // Edit for your Server and Database
-string sqlConn = "server=tcp:xxxxxxserver.database.windows.net; " +
-                 "database=Contoso; " +
+string sqlConn = "server=tcp:xxxxxx.database.windows.net; " +
+                 "database=ContosoMH; " +
                  "encrypt=true; Column Encryption Setting=Enabled; Attestation Protocol=None;";
 
 // Login to Azure 
@@ -66,7 +87,7 @@ const int _numberOfBatches = 1000;
 //  (LastNameN, FirstNameN, SalaryN, SSNN)
 // N is the batch size
 StringBuilder sb = new (); 
-sb.Append(@"INSERT INTO Employees (LastName, FirstName, Salary, SSN) VALUES ");
+sb.Append(@"INSERT INTO [HR].[Employees] (LastName, FirstName, Salary, SSN) VALUES ");
 for (int i=0; i < _batchSize; i++)
     sb.Append($"(@LastName{i},@FirstName{i},@Salary{i},@SSN{i}), ");
 
